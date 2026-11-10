@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "scale": "full",
+  "seed": 20261022,
+  "files_compared": 26,
+  "mismatched_files": [],
+  "row_counts_match": true,
+  "row_counts": {
+    "data/ground_truth/ground_truth.csv": 5,
+    "data/generated/csv/constraint_rule.csv": 1055,
+    "data/generated/csv/entity_event.csv": 0,
+    "data/generated/csv/fee_schedule.csv": 10,
+    "data/generated/csv/holding.csv": 5000,
+    "data/generated/csv/instrument.csv": 50,
+    "data/generated/csv/investor_profile.csv": 1000,
+    "data/generated/csv/market_price.csv": 12482,
+    "data/generated/csv/portfolio.csv": 1000,
+    "data/generated/csv/rebalance_proposal.csv": 0,
+    "data/generated/csv/target_allocation.csv": 5000,
+    "data/generated/csv/trade.csv": 0
+  },
+  "primary_key_sequences_match": true
+}

@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "portfolio_id": "PORT-INV-000001-01",
+  "proposal_id": "RB-2026-000002",
+  "proposal_status": "REVIEW_REQUIRED",
+  "exception_count": 1,
+  "approval_blocked_http": 409,
+  "simulation_blocked_http": 409,
+  "decision_summary": {
+    "decision": "REVIEW_REQUIRED",
+    "exceptions": [
+      {
+        "code": "EXCLUDED_INSTRUMENT",
+        "instrument_id": "INS-000034",
+        "message": "No trade proposed because instrument is excluded"
+      }
+    ],
+    "method": "Asset-class target value less current value; no discretionary override",
+    "trade_count": 4
+  }
+}

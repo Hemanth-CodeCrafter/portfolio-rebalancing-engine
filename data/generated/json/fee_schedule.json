@@ -1,0 +1,122 @@
+[
+  {
+    "fee_schedule_id": "FEE-001-T1",
+    "asset_class": "EQUITY",
+    "min_trade_value": "500.00",
+    "max_trade_value": "100000.00",
+    "fee_type": "FIXED",
+    "fee_rate": "0",
+    "fixed_fee": "15.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  },
+  {
+    "fee_schedule_id": "FEE-001-T2",
+    "asset_class": "EQUITY",
+    "min_trade_value": "100000.01",
+    "max_trade_value": "5000000.00",
+    "fee_type": "HYBRID",
+    "fee_rate": "0.001",
+    "fixed_fee": "10.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  },
+  {
+    "fee_schedule_id": "FEE-002-T1",
+    "asset_class": "DEBT",
+    "min_trade_value": "500.00",
+    "max_trade_value": "100000.00",
+    "fee_type": "FIXED",
+    "fee_rate": "0",
+    "fixed_fee": "15.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  },
+  {
+    "fee_schedule_id": "FEE-002-T2",
+    "asset_class": "DEBT",
+    "min_trade_value": "100000.01",
+    "max_trade_value": "5000000.00",
+    "fee_type": "HYBRID",
+    "fee_rate": "0.001",
+    "fixed_fee": "10.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  },
+  {
+    "fee_schedule_id": "FEE-003-T1",
+    "asset_class": "GOLD",
+    "min_trade_value": "500.00",
+    "max_trade_value": "100000.00",
+    "fee_type": "FIXED",
+    "fee_rate": "0",
+    "fixed_fee": "15.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  },
+  {
+    "fee_schedule_id": "FEE-003-T2",
+    "asset_class": "GOLD",
+    "min_trade_value": "100000.01",
+    "max_trade_value": "5000000.00",
+    "fee_type": "HYBRID",
+    "fee_rate": "0.001",
+    "fixed_fee": "10.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  },
+  {
+    "fee_schedule_id": "FEE-004-T1",
+    "asset_class": "CASH",
+    "min_trade_value": "500.00",
+    "max_trade_value": "100000.00",
+    "fee_type": "FIXED",
+    "fee_rate": "0",
+    "fixed_fee": "15.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  },
+  {
+    "fee_schedule_id": "FEE-004-T2",
+    "asset_class": "CASH",
+    "min_trade_value": "100000.01",
+    "max_trade_value": "5000000.00",
+    "fee_type": "HYBRID",
+    "fee_rate": "0.001",
+    "fixed_fee": "10.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  },
+  {
+    "fee_schedule_id": "FEE-005-T1",
+    "asset_class": "OTHER",
+    "min_trade_value": "500.00",
+    "max_trade_value": "100000.00",
+    "fee_type": "FIXED",
+    "fee_rate": "0",
+    "fixed_fee": "15.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  },
+  {
+    "fee_schedule_id": "FEE-005-T2",
+    "asset_class": "OTHER",
+    "min_trade_value": "100000.01",
+    "max_trade_value": "5000000.00",
+    "fee_type": "HYBRID",
+    "fee_rate": "0.001",
+    "fixed_fee": "10.00",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "status": "ACTIVE"
+  }
+]

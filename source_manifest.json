@@ -1,0 +1,9 @@
+{
+  "project": "Portfolio Rebalancing Engine",
+  "data_provenance": "Synthetic records generated locally by scripts/generate_data.py.",
+  "external_sources": [],
+  "personal_data": false,
+  "license_note": "No external dataset is redistributed. Synthetic educational data only.",
+  "generator_seed_default": 20261022,
+  "generator": "scripts/generate_data.py"
+}

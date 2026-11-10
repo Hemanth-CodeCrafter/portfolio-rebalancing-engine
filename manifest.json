@@ -1,0 +1,29 @@
+{
+  "project": "Portfolio Rebalancing Engine",
+  "dataset_type": "full",
+  "seed": 20261022,
+  "generated_at": "2026-11-10T00:00:00+05:30",
+  "generator": "scripts/generate_data.py",
+  "parameters": {
+    "portfolios": 1000,
+    "instruments": 50,
+    "trading_days": 250,
+    "holdings_per_portfolio": 5
+  },
+  "date_start": "2025-11-25",
+  "date_end": "2026-11-09",
+  "row_counts": {
+    "constraint_rule": 1055,
+    "entity_event": 0,
+    "fee_schedule": 10,
+    "holding": 5000,
+    "instrument": 50,
+    "investor_profile": 1000,
+    "market_price": 12482,
+    "portfolio": 1000,
+    "rebalance_proposal": 0,
+    "target_allocation": 5000,
+    "trade": 0
+  },
+  "provenance": "Entirely synthetic; no external personal or financial data used."
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "case_id": "ANOM-001",
+    "scenario": "portfolio_weight_total",
+    "input": {
+      "weights": {
+        "EQUITY": 60,
+        "DEBT": 30,
+        "GOLD": 10,
+        "CASH": 5,
+        "OTHER": 0
+      }
+    }
+  },
+  {
+    "case_id": "ANOM-002",
+    "scenario": "sell_exceeds_holding",
+    "input": {
+      "available_quantity": "10",
+      "proposed_sell_quantity": "12"
+    }
+  },
+  {
+    "case_id": "ANOM-003",
+    "scenario": "excluded_instrument_recommended",
+    "input": {
+      "instrument_id": "INS-000017",
+      "is_excluded": true,
+      "recommended_side": "BUY"
+    }
+  },
+  {
+    "case_id": "ANOM-004",
+    "scenario": "fee_omitted",
+    "input": {
+      "fee_schedule_required": true,
+      "fee_schedule_id": null,
+      "estimated_fee": null
+    }
+  },
+  {
+    "case_id": "ANOM-005",
+    "scenario": "stale_price_unflagged",
+    "input": {
+      "price_age_days": 12,
+      "is_stale": false,
+      "max_price_age_days": 5
+    }
+  }
+]

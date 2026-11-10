@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "checks": {
+    "expected_tables_present": true,
+    "all_tables_have_primary_key": true,
+    "foreign_keys_enabled_on_application_connection": true,
+    "foreign_key_integrity": true,
+    "expected_indexes_present": true,
+    "lifecycle_and_audit_triggers_present": true
+  },
+  "details": {
+    "tables": [
+      "constraint_rule",
+      "entity_event",
+      "fee_schedule",
+      "holding",
+      "instrument",
+      "investor_profile",
+      "market_price",
+      "portfolio",
+      "rebalance_proposal",
+      "target_allocation",
+      "trade"
+    ],
+    "table_count": 11,
+    "tables_with_primary_keys": [
+      "constraint_rule",
+      "entity_event",
+      "fee_schedule",
+      "holding",
+      "instrument",
+      "investor_profile",
+      "market_price",
+      "portfolio",
+      "rebalance_proposal",
+      "target_allocation",
+      "trade"
+    ],
+    "tables_with_foreign_keys": [
+      "constraint_rule",
+      "holding",
+      "market_price",
+      "portfolio",
+      "rebalance_proposal",
+      "target_allocation",
+      "trade"
+    ],
+    "foreign_key_violations": [],
+    "index_count": 8,
+    "indexes": [
+      "idx_constraint_scope_dates",
+      "idx_holding_instrument",
+      "idx_holding_portfolio_date",
+      "idx_portfolio_investor",
+      "idx_price_instrument_date",
+      "idx_proposal_portfolio_date",
+      "idx_target_portfolio_dates",
+      "idx_trade_proposal"
+    ],
+    "trigger_count": 4,
+    "triggers": [
+      "trg_entity_event_no_delete",
+      "trg_entity_event_no_update",
+      "trg_proposal_status_transition",
+      "trg_trade_status_transition"
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "status": "PASS",
+  "checks": {
+    "foreign_key_integrity": true,
+    "investor_profile_primary_key_unique": true,
+    "portfolio_primary_key_unique": true,
+    "instrument_primary_key_unique": true,
+    "holding_primary_key_unique": true,
+    "market_price_primary_key_unique": true,
+    "target_allocation_primary_key_unique": true,
+    "trade_primary_key_unique": true,
+    "fee_schedule_primary_key_unique": true,
+    "constraint_rule_primary_key_unique": true,
+    "rebalance_proposal_primary_key_unique": true,
+    "target_allocations_sum_to_100": true,
+    "holding_ids_follow_convention": true,
+    "holding_quantities_positive": true,
+    "effective_date_ordering": true,
+    "market_price_duplicates_absent": true,
+    "all_holdings_have_historical_price": true,
+    "current_portfolio_weights_reconcile": true,
+    "trade_gross_value_reconciles": true,
+    "trade_fees_reconcile": true,
+    "sell_trades_within_available_holdings": true,
+    "excluded_instruments_not_traded": true,
+    "target_effective_periods_do_not_overlap": true,
+    "active_fee_tiers_do_not_overlap": true,
+    "audit_event_references_resolve": true,
+    "all_five_negative_scenarios_detected": true,
+    "ground_truth_not_leaked_into_anomaly_inputs": true
+  },
+  "details": {
+    "foreign_key_violations": 0,
+    "row_counts": {
+      "investor_profile": 1000,
+      "portfolio": 1000,
+      "instrument": 50,
+      "holding": 5000,
+      "market_price": 12482,
+      "target_allocation": 5000,
+      "trade": 10,
+      "fee_schedule": 10,
+      "constraint_rule": 1055,
+      "rebalance_proposal": 2
+    },
+    "bad_target_portfolios": 0,
+    "explicitly_stale_price_rows": 21,
+    "missing_price_observations": 18,
+    "trade_rows_validated": 10,
+    "portfolio_weight_reconciliation": "Recomputed from source holding quantities and dated market prices for every portfolio.",
+    "anomaly_results": [
+      {
+        "case_id": "ANOM-001",
+        "scenario": "portfolio_weight_total",
+        "actual_decision": "REJECT_INPUT",
+        "expected_decision": "REJECT_INPUT",
+        "rule_id": "VAL-PORTFOLIO-001",
+        "detected": true,
+        "passed": true
+      },
+      {
+        "case_id": "ANOM-002",
+        "scenario": "sell_exceeds_holding",
+        "actual_decision": "REJECT_TRADE",
+        "expected_decision": "REJECT_TRADE",
+        "rule_id": "POL-SELL-001",
+        "detected": true,
+        "passed": true
+      },
+      {
+        "case_id": "ANOM-003",
+        "scenario": "excluded_instrument_recommended",
+        "actual_decision": "REJECT_TRADE",
+        "expected_decision": "REJECT_TRADE",
+        "rule_id": "POL-EXCLUDE-001",
+        "detected": true,
+        "passed": true
+      },
+      {
+        "case_id": "ANOM-004",
+        "scenario": "fee_omitted",
+        "actual_decision": "REVIEW_REQUIRED",
+        "expected_decision": "REVIEW_REQUIRED",
+        "rule_id": "POL-FEE-001",
+        "detected": true,
+        "passed": true
+      },
+      {
+        "case_id": "ANOM-005",
+        "scenario": "stale_price_unflagged",
+        "actual_decision": "REVIEW_REQUIRED",
+        "expected_decision": "REVIEW_REQUIRED",
+        "rule_id": "VAL-PRICE-002",
+        "detected": true,
+        "passed": true
+      }
+    ]
+  }
+}

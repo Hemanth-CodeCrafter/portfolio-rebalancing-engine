@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "portfolio_id": "PORT-INV-000002-01",
+  "proposal_id": "RB-2026-000001",
+  "http_statuses": {
+    "analysis": 200,
+    "create": 200,
+    "approve": 200,
+    "simulate": 200,
+    "trades": 200,
+    "events": 200
+  },
+  "trade_count": 5,
+  "related_event_count": 18,
+  "simulation": {
+    "proposal_id": "RB-2026-000001",
+    "status": "SIMULATED",
+    "pre_trade_value": "884251.063926",
+    "post_trade_value": "884176.09",
+    "fees_deducted": "75.00",
+    "pre_trade_total_absolute_drift_pct_points": "5.204359249925790967998777018",
+    "post_trade_total_absolute_drift_pct_points": "0.015263235546228935918425704",
+    "drift_improvement_pct_points": "5.189096014379562032080351314",
+    "post_trade_allocation": {
+      "CASH": "9.992368382226885532040787148",
+      "DEBT": "25.00211997652055403437690595",
+      "EQUITY": "50.00423879331736971598841094",
+      "GOLD": "10.00084935879722176989213243",
+      "OTHER": "5.000423489137968947701763532"
+    }
+  }
+}

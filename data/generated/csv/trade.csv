@@ -1,0 +1,1 @@
+trade_id,proposal_id,instrument_id,fee_schedule_id,side,quantity,estimated_price,gross_value,estimated_fee,status,created_at
