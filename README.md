@@ -1,170 +1,199 @@
 # Portfolio Rebalancing Engine
 
-A policy-constrained portfolio rebalancing system that compares an investor's current portfolio allocation against target allocation and generates trade recommendations while considering investment constraints, transaction fees, data quality and risk policies.
+A deterministic, policy-constrained portfolio rebalancing prototype. It analyses current holdings against target allocations, calculates allocation drift, generates buy/sell proposals, applies trading and fee policies, and simulates post-trade outcomes.
+
+> **Disclaimer:** This project uses synthetic data and simplified assumptions. It is an educational demonstration, not investment advice, a brokerage connection, or a production trade-execution system.
 
 ## 1. Project Overview
 
-The Portfolio Rebalancing Engine is a Python-based application designed to demonstrate an end-to-end portfolio rebalancing workflow.
+The Portfolio Rebalancing Engine demonstrates an end-to-end portfolio rebalancing workflow.
 
-The system analyses portfolio holdings, calculates current asset allocation and allocation drift, compares the results with the investor's target allocation, and generates rebalancing proposals.
+The application:
 
-Before a proposal can be approved or simulated, the system evaluates relevant business rules, including:
+- Analyses portfolio holdings using dated market prices.
+- Calculates current portfolio value and asset-class allocation.
+- Compares current allocation with target allocation.
+- Calculates allocation drift and Total Absolute Drift (TAD).
+- Generates deterministic buy and sell recommendations.
+- Applies trading constraints and transaction fee calculations.
+- Identifies missing prices, stale prices and policy exceptions.
+- Creates rebalancing proposals with lifecycle information.
+- Supports proposal review, approval and rejection.
+- Simulates post-trade allocation and estimated fees.
+- Records relevant proposal and trade state changes as audit events.
 
-- Minimum and maximum trade sizes
-- Excluded instruments
-- Liquidity constraints
-- Transaction fees
-- Missing and stale market prices
-- Available holding quantities
+The application uses synthetic financial data and is intended for educational and demonstration purposes.
 
-The application also maintains proposal lifecycle information and audit events so that important state changes can be traced.
-
-This project uses synthetic financial data and is intended for educational and demonstration purposes. It is not intended to provide real-world investment advice.
-
-## 2. Project Objectives
-
-The main objectives of this project are to:
-
-- Compare current portfolio holdings with target asset allocation.
-- Calculate portfolio value, allocation weights and allocation drift.
-- Generate policy-constrained buy and sell recommendations.
-- Apply transaction fee calculations and trading constraints.
-- Identify missing data, stale prices and policy exceptions.
-- Generate, review and approve rebalancing proposals.
-- Simulate post-trade portfolio allocation.
-- Preserve proposal history and record relevant state changes.
-- Validate data integrity, business rules and reproducibility.
-
-## 3. Key Features
+## 2. Key Features
 
 ### Portfolio Analysis
-- Calculates portfolio value using holdings and dated market prices.
-- Computes current allocation by asset class.
+
+- Calculates holding market value using quantity and dated market price.
+- Calculates total portfolio value.
+- Calculates current asset-class allocation percentages.
 - Compares current allocation against target allocation.
-- Calculates allocation drift and identifies deviations.
+- Calculates allocation drift in percentage points.
+- Calculates Total Absolute Drift (TAD).
 
 ### Rebalancing Recommendations
-- Identifies instruments that may need to be bought or sold.
-- Generates trade recommendations based on allocation drift.
-- Checks available holding quantities before proposing sell trades.
-- Applies configured trading constraints.
+
+- Generates BUY and SELL candidates based on target-versus-current allocation.
+- Checks available holding quantities before proposing sells.
+- Avoids trading excluded or inactive instruments.
+- Applies configured trade-size and liquidity constraints.
+- Generates proposal summaries containing decisions and exceptions.
 
 ### Policy and Fee Management
-- Supports minimum trade size rules.
-- Supports maximum trade size rules.
+
+- Supports minimum trade-size constraints.
+- Supports maximum trade-size constraints.
 - Supports minimum liquidity requirements.
-- Prevents recommendations involving excluded instruments.
-- Calculates estimated transaction fees using fee schedules.
+- Supports excluded-instrument rules.
+- Uses effective-dated fee schedules.
+- Calculates FIXED, PERCENTAGE and HYBRID transaction fees.
+- Uses Python `Decimal` for financial calculations.
 
 ### Exception Handling
-- Detects missing and stale market prices.
-- Identifies policy violations.
-- Flags proposals that require additional review.
-- Prevents approval or simulation when proposal conditions are not satisfied.
+
+The engine identifies conditions such as:
+
+- Invalid portfolio allocation totals.
+- Sell quantities exceeding available holdings.
+- Excluded instruments being selected for trading.
+- Missing required fee schedules.
+- Missing or stale market prices.
+- Liquidity and trade-size policy violations.
+
+Proposals with exceptions are marked `REVIEW_REQUIRED`.
 
 ### Proposal Lifecycle and Audit History
-- Creates rebalancing proposals with deterministic identifiers.
-- Supports proposal review, approval and rejection.
-- Records relevant state changes as audit events.
-- Preserves historical records rather than silently overwriting them.
+
+The application supports:
+
+- Proposal generation.
+- Proposal review.
+- Proposal approval.
+- Proposal rejection.
+- Trade status changes.
+- Proposal and trade event history.
+
+An append-only `entity_event` table records relevant state transitions.
 
 ### Post-Trade Simulation
-- Simulates the effect of proposed trades.
-- Calculates estimated transaction fees.
-- Recomputes post-trade portfolio allocation.
-- Measures the remaining allocation drift and improvement.
 
-## 4. Technology Stack
+- Applies proposed trades to an in-memory copy of portfolio positions.
+- Calculates estimated transaction fees.
+- Deducts estimated fees from the cash position.
+- Recalculates post-trade allocation.
+- Measures remaining allocation drift.
+- Preserves original source holding records.
+
+## 3. Technology Stack
 
 | Component | Technology |
 |---|---|
 | Programming language | Python |
 | API framework | FastAPI |
 | Database | SQLite |
-| Data validation | Python validation logic |
-| Testing | pytest |
+| Financial calculations | Python Decimal |
+| Data validation | Python validation scripts |
+| Automated testing | pytest |
 | API documentation | Swagger UI / OpenAPI |
-| Data formats | CSV, JSON and SQL seed data |
+| Data formats | CSV, JSON and SQL |
 
-## 5. Data Model
+## 4. Data Model
 
-The application uses related master, dependent and transaction entities.
-
-### Core entities
+The database contains ten business entities plus an audit-event entity.
 
 | Entity | Purpose |
 |---|---|
-| InvestorProfile | Stores synthetic investor profiles and risk information |
-| Portfolio | Represents an investor's portfolio |
-| Instrument | Stores instrument and asset-class information |
-| Holding | Stores instrument quantities held in a portfolio |
-| MarketPrice | Stores dated instrument market prices |
-| TargetAllocation | Stores the target allocation for a portfolio |
-| Trade | Stores proposed trade information |
-| FeeSchedule | Defines transaction fee rules |
-| Constraint | Stores applicable trading and policy constraints |
-| RebalanceProposal | Represents a generated rebalancing proposal |
+| InvestorProfile | Synthetic investor details and risk profile |
+| Portfolio | Investor portfolio information |
+| Instrument | Instrument and asset-class information |
+| Holding | Instrument quantities held in a portfolio |
+| MarketPrice | Dated market-price observations |
+| TargetAllocation | Effective-dated target allocation |
+| Trade | Proposed trade information |
+| FeeSchedule | Transaction fee rules |
+| Constraint | Trading and policy constraints |
+| RebalanceProposal | Rebalancing proposal and lifecycle status |
+| EntityEvent | Audit history of relevant state changes |
 
-The database also includes an audit-event entity for recording relevant state changes.
+Primary keys, foreign keys, unique constraints, effective dates and lifecycle rules are defined in the database design.
 
-Primary keys, foreign keys, relationships, effective dates and lifecycle rules are defined as part of the database design.
+Financial values are stored as decimal text and processed using Python `Decimal`.
 
-## 6. Synthetic Dataset
+See:
+
+- [Database Design](docs/database_design.md)
+- [Data Dictionary](docs/data_dictionary.md)
+- [ER Diagram](docs/er_diagram.md)
+
+## 5. Synthetic Dataset
 
 The project uses deterministic synthetic data generated with a fixed random seed.
 
-### Full dataset coverage
+**Default random seed:** `20261022`
+
+### Full dataset
 
 | Dataset | Records |
 |---|---:|
 | Investor profiles | 1,000 |
 | Portfolios | 1,000 |
-| Distinct instruments | 50 |
+| Instruments | 50 |
 | Holdings | 5,000 |
-| Market-price records | 12,482 |
+| Market-price observations | 12,482 |
 | Target allocations | 5,000 |
 | Fee schedules | 10 |
 | Constraint rules | 1,055 |
+| Rebalance proposals in baseline | 0 |
+| Trades in baseline | 0 |
+| Audit events in baseline | 0 |
 
-The market-price dataset covers 250 trading days.
+The full generator is configured for 250 trading days. Some price observations are deliberately missing, so the exported market-price row count is lower than the theoretical maximum.
 
-The generated data includes meaningful variation and scenarios involving missing prices, stale prices, high allocation drift, liquidity constraints and different fee tiers.
+The full dataset contains:
 
-**Random seed:** `20261022`
+- 21 explicitly stale price rows.
+- 18 missing price observations.
+- Five asset classes: EQUITY, DEBT, GOLD, CASH and OTHER.
+- Synthetic investor risk profiles and target allocations.
+- Effective-dated policy constraints and fee schedules.
 
-The same data-generation logic supports starter and full dataset scales.
+All records are synthetic. No external personal or financial dataset is used.
 
-### Deterministic ID conventions
+See [manifest.json](manifest.json) and [source_manifest.json](source_manifest.json) for dataset metadata and provenance.
 
-The project follows the specified identifier conventions:
+### Dataset scales
 
-- Investor: `INV-000001`
-- Portfolio: `PORT-<investor-id>-01`
-- Instrument: `INS-000001`
-- Holding: `HOLD-<portfolio-id>-<instrument-id>`
-- Rebalance proposal: `RB-2026-000001`
+| Scale | Portfolios | Instruments | Trading days |
+|---|---:|---:|---:|
+| Starter | 10 | 10 | 30 |
+| Full | 1,000 | 50 | 250 |
 
-Identifiers are designed to remain consistent across related records and exported datasets.
+Both scales use the same generator and default seed.
 
-## 7. Negative Scenarios and Ground Truth
+## 6. Negative Scenarios and Ground Truth
 
-Five deliberate edge cases are included to evaluate the system's ability to detect invalid inputs and policy exceptions.
+Five deliberate negative scenarios are included to test validation and policy handling.
 
 | Scenario | Expected decision |
 |---|---|
-| Portfolio weights do not sum to 100% | REJECT_INPUT |
-| Proposed sell quantity exceeds available holding | REJECT_TRADE |
-| Excluded instrument is recommended | REJECT_TRADE |
-| Required transaction fee is missing | REVIEW_REQUIRED |
-| Stale price is used without being flagged | REVIEW_REQUIRED |
+| Portfolio weights do not total 100% | `REJECT_INPUT` |
+| Sell quantity exceeds available holding | `REJECT_TRADE` |
+| Excluded instrument is recommended | `REJECT_TRADE` |
+| Required fee information is missing | `REVIEW_REQUIRED` |
+| Stale price is not flagged | `REVIEW_REQUIRED` |
 
-Known anomaly labels and expected decisions are maintained separately in the ground-truth dataset.
+The anomaly inputs are maintained separately from expected decisions.
 
-This separation helps prevent expected outcomes from leaking into the input data used for validation.
+- Anomaly inputs: `data/anomalies/anomaly_cases.json`
+- Expected labels: `data/ground_truth/ground_truth.csv`
 
-## 8. Project Structure
+The validation script evaluates the scenarios against the expected decisions and checks that ground-truth labels are not included in the anomaly inputs.
 
-The main project structure is organised as follows:
+## 7. Project Structure
 
 ```text
 portfolio-rebalancing-engine/
@@ -179,6 +208,7 @@ portfolio-rebalancing-engine/
 │
 ├── data/
 │   ├── generated/
+│   │   ├── database/
 │   │   ├── csv/
 │   │   └── json/
 │   ├── anomalies/
@@ -207,12 +237,14 @@ portfolio-rebalancing-engine/
 │   └── test_negative_scenarios.py
 │
 ├── README.md
+├── manifest.json
+├── source_manifest.json
 ├── requirements.txt
 ├── pyproject.toml
 └── .gitignore
 ```
 
-## 9. Installation and Setup
+## 8. Installation and Setup
 
 ### Prerequisites
 
@@ -223,7 +255,7 @@ portfolio-rebalancing-engine/
 ### Step 1: Clone the repository
 
 ```bash
-git clone <your-github-repository-url>
+git clone https://github.com/Hemanth-CodeCrafter/portfolio-rebalancing-engine.git
 cd portfolio-rebalancing-engine
 ```
 
@@ -246,10 +278,10 @@ source .venv/bin/activate
 ### Step 3: Install dependencies
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-## 10. Running the Application
+## 9. Running the Application
 
 Start the FastAPI application from the project root:
 
@@ -259,24 +291,26 @@ uvicorn app.main:app --reload
 
 The application will be available at:
 
-- API root: http://127.0.0.1:8000/
-- Swagger documentation: http://127.0.0.1:8000/docs
-- OpenAPI schema: http://127.0.0.1:8000/openapi.json
+| Resource | URL |
+|---|---|
+| API root | http://127.0.0.1:8000/ |
+| Swagger UI | http://127.0.0.1:8000/docs |
+| OpenAPI schema | http://127.0.0.1:8000/openapi.json |
 
-Swagger UI can be used to execute and inspect the available API endpoints.
+Swagger UI can be used to inspect and execute the available API endpoints.
 
-## 11. API Workflow
+## 10. API Workflow
 
-The main API workflow follows these steps:
+The main workflow is:
 
 1. Retrieve available portfolios.
 2. Retrieve portfolio details and holdings.
 3. Analyse current allocation and allocation drift.
 4. Generate a rebalancing proposal.
 5. Inspect proposal details and recommended trades.
-6. Approve or reject the proposal, subject to policy checks.
-7. Simulate the proposed trades.
-8. Inspect audit events and proposal history.
+6. Review, approve or reject the proposal.
+7. Simulate proposed trades.
+8. Inspect post-trade allocation and audit events.
 
 ### Main API endpoints
 
@@ -286,59 +320,55 @@ The main API workflow follows these steps:
 | GET | `/portfolios` | List portfolios |
 | GET | `/portfolios/{portfolio_id}` | Retrieve portfolio details |
 | GET | `/portfolios/{portfolio_id}/analysis` | Analyse portfolio allocation |
-| POST | `/portfolios/{portfolio_id}/rebalance` | Generate a rebalance proposal |
+| POST | `/portfolios/{portfolio_id}/rebalance` | Generate a rebalancing proposal |
 | GET | `/proposals/{proposal_id}` | Retrieve proposal details |
 | GET | `/proposals/{proposal_id}/trades` | Retrieve proposal trades |
-| POST | `/proposals/{proposal_id}/approve` | Approve a proposal |
+| POST | `/proposals/{proposal_id}/approve` | Approve an eligible proposal |
 | POST | `/proposals/{proposal_id}/reject` | Reject a proposal |
 | POST | `/proposals/{proposal_id}/simulate` | Simulate proposed trades |
-| GET | `/proposals/{proposal_id}/events` | Retrieve proposal events |
+| GET | `/proposals/{proposal_id}/events` | Retrieve proposal-related events |
 | GET | `/events` | Retrieve audit events |
-| GET | `/trades` | Retrieve trade records |
+| GET | `/trades` | Retrieve trades |
 
-### Example: Generate a rebalancing proposal
+See [docs/demo_walkthrough.md](docs/demo_walkthrough.md) for a step-by-step demonstration.
 
-The rebalance endpoint expects an ISO-format date in its JSON request body.
+## 11. Data Generation and Validation
 
-```json
-{
-  "as_of_date": "YYYY-MM-DD"
-}
+Run the following commands from the repository root.
+
+**Important:** The data generator rebuilds the local SQLite baseline database and overwrites generated exports and manifests. Back up any generated data you need before running it.
+
+### Generate the full dataset
+
+```bash
+python -m scripts.generate_data --scale full --seed 20261022
 ```
 
-Use a date supported by the available market-price data.
+### Generate the starter dataset
 
-The generated proposal ID can then be used to retrieve proposal details, inspect trades, approve or reject the proposal, and run the simulation.
+```bash
+python -m scripts.generate_data --scale starter --seed 20261022
+```
 
-## 12. Data Generation and Validation
-
-The project includes scripts for generating, exporting and validating synthetic datasets.
-
-The following commands are used for validation:
-
-### Database schema validation
+### Validate the database schema
 
 ```bash
 python -m scripts.validate_schema
 ```
 
-Checks expected tables, primary keys, foreign-key integrity, indexes and lifecycle/audit triggers.
-
-### Data validation
+### Validate generated data
 
 ```bash
 python -m scripts.validate_data
 ```
 
-Checks identifiers, relationships, allocation totals, arithmetic reconciliation, fee calculations, trade constraints and negative scenarios.
-
-### Automated tests
+### Run automated tests
 
 ```bash
 pytest -v
 ```
 
-### Reproducibility verification
+### Verify reproducibility
 
 ```bash
 python -m scripts.verify_reproducibility --scale starter
@@ -348,64 +378,118 @@ python -m scripts.verify_reproducibility --scale starter
 python -m scripts.verify_reproducibility --scale full
 ```
 
-These commands compare generated outputs using the fixed seed and check whether row counts and file contents remain consistent.
+The reproducibility script compares generated file checksums, row counts and primary-key sequences.
 
-For data-generation and export options, refer to the corresponding scripts and their available command-line arguments.
+The scripts write validation and reproducibility results into the `reports/` directory.
 
-## 13. Validation Results
+## 12. Validation Results
 
-The project was tested using automated tests, schema validation, data validation, negative-scenario checks and reproducibility verification.
+The committed validation artifacts report the following results.
 
-The latest recorded results include:
+### Database schema validation
 
-- 18 automated tests passed.
-- 11 database tables validated.
-- 8 database indexes verified.
-- 4 lifecycle and audit triggers verified.
-- Zero foreign-key violations.
-- Five negative scenarios evaluated against expected decisions.
-- 10 trade records validated.
-- Portfolio weights recomputed from source holdings and dated market prices.
-- Starter dataset reproducibility passed.
-- Full dataset reproducibility passed.
-- Fixed random seed: `20261022`.
+- Status: **PASS**
+- Database tables: 11
+- Tables with primary keys: 11
+- Custom indexes: 8
+- Lifecycle and audit triggers: 4
+- Foreign-key violations: 0
 
-A Starlette/httpx deprecation warning was observed during testing. It did not cause any test failures.
+### Data validation
 
-Validation outputs and supporting reports are maintained in the `reports/` directory.
+- Status: **PASS**
+- Validation checks: 27/27
+- Invalid target-allocation portfolios: 0
+- Explicitly stale price rows: 21
+- Missing price observations: 18
+- Negative scenarios detected: 5/5
+- Ground-truth leakage into anomaly inputs: None
 
-## 14. Business Rules and Important Design Decisions
+### Automated testing
 
-The engine follows documented policy rules when evaluating rebalancing recommendations.
+- Tests passed: **18**
+- Test failures: 0
+- One non-blocking Starlette/httpx deprecation warning was reported.
 
-Examples include:
+### Full-scale reproducibility
 
-- A sell recommendation must not exceed the available holding quantity.
-- Excluded instruments must not be recommended for trading.
-- Trade sizes must comply with configured minimum and maximum limits.
-- Liquidity requirements must be considered.
-- Required transaction fees must be available and calculated.
-- Missing or stale market prices must be identified.
-- Proposals with unresolved exceptions require review rather than unrestricted approval.
+- Status: **PASS**
+- Generated files compared: 26
+- Checksum mismatches: 0
+- Row counts matched: Yes
+- Primary-key sequences matched: Yes
 
-Post-trade allocation is recalculated from the simulated holdings and applicable market prices rather than being independently generated.
+Detailed results are available in:
 
-The simulation is intended to evaluate the proposed outcome and does not directly overwrite the original source holdings.
+- `reports/schema_validation.json`
+- `reports/validation_summary.json`
+- `reports/pytest_results.txt`
+- `reports/reproducibility_report.json`
 
-Further details are available in `docs/business_rules.md` and `docs/architecture.md`.
+### API workflow demonstration
 
-## 15. Limitations and Future Improvements
+The recorded successful API workflow demonstrates:
 
-This is an educational prototype built using synthetic data.
+- Portfolio analysis.
+- Proposal generation.
+- Five proposed trades.
+- Proposal approval.
+- Post-trade simulation.
+- Audit-event creation.
 
-Possible future improvements include:
+For the demonstration portfolio, TAD decreased from approximately 5.2044 to 0.0153 percentage points after simulation, with INR 75.00 in estimated fees deducted.
 
-- Support for additional instrument types and asset classes.
+A separate exception-path demonstration confirms that an excluded instrument results in `REVIEW_REQUIRED` and that approval and simulation requests are blocked with HTTP 409.
+
+See:
+
+- `reports/api_workflow_report.json`
+- `reports/exception_path_report.json`
+
+The baseline database is intentionally kept clean; the demonstration proposals and trades are documented in separate reports rather than retained in the baseline tables.
+
+## 13. Actors and Access Boundaries
+
+The intended business workflow has four conceptual actors:
+
+| Actor | Responsibility |
+|---|---|
+| Customer / Account Holder | Portfolio ownership, investment profile and target preferences |
+| Operations Analyst | Portfolio analysis and proposal generation |
+| Risk / Compliance Reviewer | Exception review and proposal approval or rejection |
+| System Administrator | Database, application and dataset management |
+
+**Implementation limitation:** The current API does not implement authentication or role-based access control. These actors describe the intended business workflow; they are not enforced application roles.
+
+## 14. Important Design Decisions and Limitations
+
+- Portfolio valuation uses the latest eligible market price on or before the requested valuation date.
+- Missing historical prices are not invented or forward-filled.
+- Stale prices are identified and affected trades are blocked.
+- Financial calculations use Python `Decimal`.
+- Sell quantities cannot exceed available holding quantities.
+- Applicable constraints and fee schedules are selected using their effective dates.
+- Simulation uses an in-memory copy of positions and does not overwrite original Holding records.
+- Audit events are protected against update and deletion by database triggers.
+- The current `Holding` key represents one canonical portfolio/instrument position rather than a full multi-date position-history table.
+- The current rebalancing implementation selects one holding per asset class when sizing trades. The generated baseline has one holding per asset class in each portfolio. Additional instrument-selection logic is needed to support multiple holdings within the same asset class generally.
+- The simulation service currently permits proposals in `GENERATED` as well as `APPROVED` status. Approval is supported by the API, but is not yet a mandatory simulation gate.
+- The API has no authentication or role-based authorization.
+- INR is the baseline currency; FX conversion is out of scope.
+- Synthetic prices are not live market observations.
+
+## 15. Future Improvements
+
+Potential improvements include:
+
+- Multi-instrument allocation and trade selection within each asset class.
+- Mandatory approval enforcement before simulation.
+- Authentication and role-based access controls.
+- Additional instrument types and asset classes.
 - More advanced liquidity and execution-cost modelling.
-- Enhanced risk and portfolio performance metrics.
-- Additional API authentication and role-based access controls.
-- A dedicated frontend for portfolio analysis and proposal review.
-- More extensive integration and performance testing.
+- Additional portfolio risk and performance metrics.
+- A dedicated frontend for analysis and proposal review.
+- Expanded integration and performance testing.
 
 ## 16. Disclaimer
 
@@ -417,6 +501,6 @@ It is intended for educational, development and demonstration purposes only. It 
 
 ## Project Summary
 
-The Portfolio Rebalancing Engine demonstrates how portfolio allocation analysis, policy-based trade recommendations, fee calculations, exception handling, proposal lifecycle management, auditability and post-trade simulation can be combined into one end-to-end workflow.
+The Portfolio Rebalancing Engine demonstrates how portfolio valuation, allocation analysis, policy-constrained trade recommendations, fee calculations, exception handling, proposal lifecycle management, auditability and post-trade simulation can be combined into an end-to-end software workflow.
 
-The implementation focuses on data consistency, deterministic generation, documented business rules, validation and traceability.
+The implementation emphasizes deterministic data generation, data integrity, documented business rules, validation and traceability.
