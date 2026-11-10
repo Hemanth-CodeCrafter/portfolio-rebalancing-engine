@@ -36,7 +36,7 @@
   },
   "checksums": {
     "manifest.json": "3d2e6471932870275205691cba20464545551feddec2a5ea8313566926b80212",
-    "data\\generated\\database\\seed.sql": "765aa0b54169146c8ddd4961fe1f45f823e1d9e2a3e745f2bdeff74705583fa4",
+    "data\\generated\\database\\seed.sql": "9c074ff19278bc024318158fe4c8bfc32e5b21f5c9218a5a42d3a839d079d7fe",
     "data\\ground_truth\\ground_truth.csv": "156fba24953ae044ffd6dbed06b5ffea33aa6bc2d640d4f63d8a9bf55d9f3f34",
     "data\\anomalies\\anomaly_cases.json": "a4d10ebeeb1a59a6e80df47f35b11b40df0b4c3e6bb638767c282381a7f472af",
     "data\\generated\\csv\\constraint_rule.csv": "671b71599bfeb856b6110b553479f835352dfbcfc9ca8a03f8576731f626279d",

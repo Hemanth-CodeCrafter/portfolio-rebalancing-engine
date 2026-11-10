@@ -1,15 +1,27 @@
 BEGIN TRANSACTION;
 CREATE TABLE constraint_rule (
     constraint_id TEXT PRIMARY KEY,
-    portfolio_id TEXT REFERENCES portfolio(portfolio_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    instrument_id TEXT REFERENCES instrument(instrument_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    constraint_type TEXT NOT NULL CHECK (constraint_type IN ('MIN_TRADE_SIZE','MAX_TRADE_SIZE','MIN_LIQUIDITY','EXCLUDED_INSTRUMENT')),
-    operator TEXT NOT NULL CHECK (operator IN ('GT','GTE','LT','LTE','EQ','NE')),
+    portfolio_id TEXT REFERENCES portfolio(portfolio_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    instrument_id TEXT REFERENCES instrument(instrument_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    constraint_type TEXT NOT NULL CHECK (
+        constraint_type IN (
+            'MIN_TRADE_SIZE',
+            'MAX_TRADE_SIZE',
+            'MIN_LIQUIDITY',
+            'EXCLUDED_INSTRUMENT'
+        )
+    ),
+    operator TEXT NOT NULL
+        CHECK (operator IN ('GT','GTE','LT','LTE','EQ','NE')),
     threshold_value TEXT NOT NULL,
-    threshold_unit TEXT NOT NULL CHECK (threshold_unit IN ('INR','PERCENT','UNITS','FLAG')),
+    threshold_unit TEXT NOT NULL
+        CHECK (threshold_unit IN ('INR','PERCENT','UNITS','FLAG')),
     effective_from TEXT NOT NULL,
     effective_to TEXT,
-    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','INACTIVE')),
+    status TEXT NOT NULL DEFAULT 'ACTIVE'
+        CHECK (status IN ('ACTIVE','INACTIVE')),
     CHECK ((portfolio_id IS NOT NULL) <> (instrument_id IS NOT NULL)),
     CHECK (effective_to IS NULL OR effective_to >= effective_from)
 );
@@ -1070,7 +1082,17 @@ INSERT INTO "constraint_rule" VALUES('CON-INS-000034',NULL,'INS-000034','EXCLUDE
 INSERT INTO "constraint_rule" VALUES('CON-LIQ-000039',NULL,'INS-000039','MIN_LIQUIDITY','GTE','5000','UNITS','2026-01-01',NULL,'ACTIVE');
 CREATE TABLE entity_event (
     event_id TEXT PRIMARY KEY,
-    entity_type TEXT NOT NULL CHECK (entity_type IN ('INVESTOR','PORTFOLIO','HOLDING','PROPOSAL','TRADE','CONSTRAINT')),
+    entity_type TEXT NOT NULL
+        CHECK (
+            entity_type IN (
+                'INVESTOR',
+                'PORTFOLIO',
+                'HOLDING',
+                'PROPOSAL',
+                'TRADE',
+                'CONSTRAINT'
+            )
+        ),
     entity_id TEXT NOT NULL,
     event_type TEXT NOT NULL,
     previous_state TEXT,
@@ -1080,15 +1102,24 @@ CREATE TABLE entity_event (
 );
 CREATE TABLE fee_schedule (
     fee_schedule_id TEXT PRIMARY KEY,
-    asset_class TEXT NOT NULL CHECK (asset_class IN ('EQUITY','DEBT','GOLD','CASH','OTHER')),
-    min_trade_value TEXT NOT NULL CHECK (CAST(min_trade_value AS REAL) >= 0),
-    max_trade_value TEXT CHECK (max_trade_value IS NULL OR CAST(max_trade_value AS REAL) >= CAST(min_trade_value AS REAL)),
-    fee_type TEXT NOT NULL CHECK (fee_type IN ('FIXED','PERCENTAGE','HYBRID')),
-    fee_rate TEXT NOT NULL DEFAULT '0' CHECK (CAST(fee_rate AS REAL) >= 0),
-    fixed_fee TEXT NOT NULL DEFAULT '0' CHECK (CAST(fixed_fee AS REAL) >= 0),
+    asset_class TEXT NOT NULL
+        CHECK (asset_class IN ('EQUITY','DEBT','GOLD','CASH','OTHER')),
+    min_trade_value TEXT NOT NULL
+        CHECK (CAST(min_trade_value AS REAL) >= 0),
+    max_trade_value TEXT CHECK (
+        max_trade_value IS NULL
+        OR CAST(max_trade_value AS REAL) >= CAST(min_trade_value AS REAL)
+    ),
+    fee_type TEXT NOT NULL
+        CHECK (fee_type IN ('FIXED','PERCENTAGE','HYBRID')),
+    fee_rate TEXT NOT NULL DEFAULT '0'
+        CHECK (CAST(fee_rate AS REAL) >= 0),
+    fixed_fee TEXT NOT NULL DEFAULT '0'
+        CHECK (CAST(fixed_fee AS REAL) >= 0),
     effective_from TEXT NOT NULL,
     effective_to TEXT,
-    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','INACTIVE')),
+    status TEXT NOT NULL DEFAULT 'ACTIVE'
+        CHECK (status IN ('ACTIVE','INACTIVE')),
     CHECK (effective_to IS NULL OR effective_to >= effective_from),
     UNIQUE (asset_class, min_trade_value, effective_from)
 );
@@ -1104,8 +1135,10 @@ INSERT INTO "fee_schedule" VALUES('FEE-005-T1','OTHER','500.00','100000.00','FIX
 INSERT INTO "fee_schedule" VALUES('FEE-005-T2','OTHER','100000.01','5000000.00','HYBRID','0.001','10.00','2026-01-01',NULL,'ACTIVE');
 CREATE TABLE holding (
     holding_id TEXT PRIMARY KEY,
-    portfolio_id TEXT NOT NULL REFERENCES portfolio(portfolio_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    instrument_id TEXT NOT NULL REFERENCES instrument(instrument_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    portfolio_id TEXT NOT NULL REFERENCES portfolio(portfolio_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    instrument_id TEXT NOT NULL REFERENCES instrument(instrument_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
     quantity TEXT NOT NULL CHECK (CAST(quantity AS REAL) >= 0),
     as_of_date TEXT NOT NULL,
     created_at TEXT NOT NULL,
@@ -6113,10 +6146,15 @@ INSERT INTO "holding" VALUES('HOLD-PORT-INV-001000-01-INS-000033','PORT-INV-0010
 INSERT INTO "holding" VALUES('HOLD-PORT-INV-001000-01-INS-000049','PORT-INV-001000-01','INS-000049','64.1066','2026-11-09','2026-11-10T00:00:00+05:30');
 INSERT INTO "holding" VALUES('HOLD-PORT-INV-001000-01-INS-000015','PORT-INV-001000-01','INS-000015','93.7882','2026-11-09','2026-11-10T00:00:00+05:30');
 CREATE TABLE instrument (
-    instrument_id TEXT PRIMARY KEY CHECK (instrument_id GLOB 'INS-[0-9][0-9][0-9][0-9][0-9][0-9]'),
-    symbol TEXT NOT NULL UNIQUE COLLATE NOCASE CHECK (length(trim(symbol)) > 0),
-    instrument_name TEXT NOT NULL CHECK (length(trim(instrument_name)) > 0),
-    asset_class TEXT NOT NULL CHECK (asset_class IN ('EQUITY','DEBT','GOLD','CASH','OTHER')),
+    instrument_id TEXT PRIMARY KEY CHECK (
+        instrument_id GLOB 'INS-[0-9][0-9][0-9][0-9][0-9][0-9]'
+    ),
+    symbol TEXT NOT NULL UNIQUE COLLATE NOCASE
+        CHECK (length(trim(symbol)) > 0),
+    instrument_name TEXT NOT NULL
+        CHECK (length(trim(instrument_name)) > 0),
+    asset_class TEXT NOT NULL
+        CHECK (asset_class IN ('EQUITY','DEBT','GOLD','CASH','OTHER')),
     instrument_type TEXT NOT NULL,
     currency TEXT NOT NULL CHECK (length(currency) = 3),
     is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0,1)),
@@ -6173,12 +6211,17 @@ INSERT INTO "instrument" VALUES('INS-000048','SYN0048','Synthetic Gold Instrumen
 INSERT INTO "instrument" VALUES('INS-000049','SYN0049','Synthetic Cash Instrument 0049','CASH','DEPOSIT','INR',1,0);
 INSERT INTO "instrument" VALUES('INS-000050','SYN0050','Synthetic Other Instrument 0050','OTHER','ETF','INR',1,0);
 CREATE TABLE investor_profile (
-    investor_id TEXT PRIMARY KEY CHECK (investor_id GLOB 'INV-[0-9][0-9][0-9][0-9][0-9][0-9]'),
+    investor_id TEXT PRIMARY KEY CHECK (
+        investor_id GLOB 'INV-[0-9][0-9][0-9][0-9][0-9][0-9]'
+    ),
     full_name TEXT NOT NULL CHECK (length(trim(full_name)) > 0),
     email TEXT NOT NULL COLLATE NOCASE UNIQUE CHECK (instr(email, '@') > 1),
-    risk_profile TEXT NOT NULL CHECK (risk_profile IN ('CONSERVATIVE','MODERATE','AGGRESSIVE')),
+    risk_profile TEXT NOT NULL CHECK (
+        risk_profile IN ('CONSERVATIVE','MODERATE','AGGRESSIVE')
+    ),
     created_at TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','INACTIVE'))
+    status TEXT NOT NULL DEFAULT 'ACTIVE'
+        CHECK (status IN ('ACTIVE','INACTIVE'))
 );
 INSERT INTO "investor_profile" VALUES('INV-000001','Synthetic Investor 0001','investor000001@example.test','MODERATE','2026-11-10T00:00:00+05:30','ACTIVE');
 INSERT INTO "investor_profile" VALUES('INV-000002','Synthetic Investor 0002','investor000002@example.test','MODERATE','2026-11-10T00:00:00+05:30','ACTIVE');
@@ -7182,13 +7225,16 @@ INSERT INTO "investor_profile" VALUES('INV-000999','Synthetic Investor 0999','in
 INSERT INTO "investor_profile" VALUES('INV-001000','Synthetic Investor 1000','investor001000@example.test','MODERATE','2026-11-10T00:00:00+05:30','ACTIVE');
 CREATE TABLE market_price (
     market_price_id TEXT PRIMARY KEY,
-    instrument_id TEXT NOT NULL REFERENCES instrument(instrument_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    instrument_id TEXT NOT NULL REFERENCES instrument(instrument_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
     price_date TEXT NOT NULL,
     price TEXT NOT NULL CHECK (CAST(price AS REAL) > 0),
     currency TEXT NOT NULL CHECK (length(currency) = 3),
     source TEXT NOT NULL,
     is_stale INTEGER NOT NULL DEFAULT 0 CHECK (is_stale IN (0,1)),
-    daily_volume TEXT CHECK (daily_volume IS NULL OR CAST(daily_volume AS REAL) >= 0),
+    daily_volume TEXT CHECK (
+        daily_volume IS NULL OR CAST(daily_volume AS REAL) >= 0
+    ),
     created_at TEXT NOT NULL,
     UNIQUE (instrument_id, price_date, source)
 );
@@ -19676,13 +19722,22 @@ INSERT INTO "market_price" VALUES('MP-000012481','INS-000050','2026-11-06','1124
 INSERT INTO "market_price" VALUES('MP-000012482','INS-000050','2026-11-09','1152.99','INR','SYNTHETIC_FIXED_SEED',0,'97189','2026-11-10T00:00:00+05:30');
 CREATE TABLE portfolio (
     portfolio_id TEXT PRIMARY KEY,
-    investor_id TEXT NOT NULL REFERENCES investor_profile(investor_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    investor_id TEXT NOT NULL REFERENCES investor_profile(investor_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
     portfolio_name TEXT NOT NULL CHECK (length(trim(portfolio_name)) > 0),
-    base_currency TEXT NOT NULL DEFAULT 'INR' CHECK (length(base_currency) = 3),
+    base_currency TEXT NOT NULL DEFAULT 'INR'
+        CHECK (length(base_currency) = 3),
     created_at TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','INACTIVE','CLOSED')),
+    status TEXT NOT NULL DEFAULT 'ACTIVE'
+        CHECK (status IN ('ACTIVE','INACTIVE','CLOSED')),
     UNIQUE (investor_id, portfolio_id),
-    CHECK (substr(portfolio_id, 1, length('PORT-' || investor_id || '-')) = 'PORT-' || investor_id || '-')
+    CHECK (
+        substr(
+            portfolio_id,
+            1,
+            length('PORT-' || investor_id || '-')
+        ) = 'PORT-' || investor_id || '-'
+    )
 );
 INSERT INTO "portfolio" VALUES('PORT-INV-000001-01','INV-000001','Portfolio 0001','INR','2026-11-10T00:00:00+05:30','ACTIVE');
 INSERT INTO "portfolio" VALUES('PORT-INV-000002-01','INV-000002','Portfolio 0002','INR','2026-11-10T00:00:00+05:30','ACTIVE');
@@ -20685,23 +20740,46 @@ INSERT INTO "portfolio" VALUES('PORT-INV-000998-01','INV-000998','Portfolio 0998
 INSERT INTO "portfolio" VALUES('PORT-INV-000999-01','INV-000999','Portfolio 0999','INR','2026-11-10T00:00:00+05:30','ACTIVE');
 INSERT INTO "portfolio" VALUES('PORT-INV-001000-01','INV-001000','Portfolio 1000','INR','2026-11-10T00:00:00+05:30','ACTIVE');
 CREATE TABLE rebalance_proposal (
-    proposal_id TEXT PRIMARY KEY CHECK (proposal_id GLOB 'RB-2026-[0-9][0-9][0-9][0-9][0-9][0-9]'),
-    portfolio_id TEXT NOT NULL REFERENCES portfolio(portfolio_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    proposal_id TEXT PRIMARY KEY CHECK (
+        proposal_id GLOB 'RB-2026-[0-9][0-9][0-9][0-9][0-9][0-9]'
+    ),
+    portfolio_id TEXT NOT NULL REFERENCES portfolio(portfolio_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
     as_of_date TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'GENERATED' CHECK (status IN ('GENERATED','REVIEW_REQUIRED','APPROVED','REJECTED','SIMULATED')),
-    pre_trade_value TEXT NOT NULL CHECK (CAST(pre_trade_value AS REAL) >= 0),
-    post_trade_value TEXT CHECK (post_trade_value IS NULL OR CAST(post_trade_value AS REAL) >= 0),
+    status TEXT NOT NULL DEFAULT 'GENERATED'
+        CHECK (
+            status IN (
+                'GENERATED',
+                'REVIEW_REQUIRED',
+                'APPROVED',
+                'REJECTED',
+                'SIMULATED'
+            )
+        ),
+    pre_trade_value TEXT NOT NULL
+        CHECK (CAST(pre_trade_value AS REAL) >= 0),
+    post_trade_value TEXT
+        CHECK (
+            post_trade_value IS NULL
+            OR CAST(post_trade_value AS REAL) >= 0
+        ),
     pre_trade_drift_pct TEXT NOT NULL,
     post_trade_drift_pct TEXT,
-    exception_count INTEGER NOT NULL DEFAULT 0 CHECK (exception_count >= 0),
+    exception_count INTEGER NOT NULL DEFAULT 0
+        CHECK (exception_count >= 0),
     decision_summary TEXT NOT NULL,
     created_at TEXT NOT NULL
 );
 CREATE TABLE target_allocation (
     target_allocation_id TEXT PRIMARY KEY,
-    portfolio_id TEXT NOT NULL REFERENCES portfolio(portfolio_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    asset_class TEXT NOT NULL CHECK (asset_class IN ('EQUITY','DEBT','GOLD','CASH','OTHER')),
-    target_weight_pct TEXT NOT NULL CHECK (CAST(target_weight_pct AS REAL) >= 0 AND CAST(target_weight_pct AS REAL) <= 100),
+    portfolio_id TEXT NOT NULL REFERENCES portfolio(portfolio_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    asset_class TEXT NOT NULL
+        CHECK (asset_class IN ('EQUITY','DEBT','GOLD','CASH','OTHER')),
+    target_weight_pct TEXT NOT NULL CHECK (
+        CAST(target_weight_pct AS REAL) >= 0
+        AND CAST(target_weight_pct AS REAL) <= 100
+    ),
     effective_from TEXT NOT NULL,
     effective_to TEXT,
     created_at TEXT NOT NULL,
@@ -25710,44 +25788,93 @@ INSERT INTO "target_allocation" VALUES('TA-001000-04','PORT-INV-001000-01','CASH
 INSERT INTO "target_allocation" VALUES('TA-001000-05','PORT-INV-001000-01','OTHER','5','2026-01-01',NULL,'2026-11-10T00:00:00+05:30');
 CREATE TABLE trade (
     trade_id TEXT PRIMARY KEY,
-    proposal_id TEXT NOT NULL REFERENCES rebalance_proposal(proposal_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    instrument_id TEXT NOT NULL REFERENCES instrument(instrument_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    fee_schedule_id TEXT REFERENCES fee_schedule(fee_schedule_id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    proposal_id TEXT NOT NULL REFERENCES rebalance_proposal(proposal_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    instrument_id TEXT NOT NULL REFERENCES instrument(instrument_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    fee_schedule_id TEXT REFERENCES fee_schedule(fee_schedule_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
     side TEXT NOT NULL CHECK (side IN ('BUY','SELL')),
     quantity TEXT NOT NULL CHECK (CAST(quantity AS REAL) > 0),
     estimated_price TEXT NOT NULL CHECK (CAST(estimated_price AS REAL) > 0),
     gross_value TEXT NOT NULL CHECK (CAST(gross_value AS REAL) > 0),
     estimated_fee TEXT NOT NULL CHECK (CAST(estimated_fee AS REAL) >= 0),
-    status TEXT NOT NULL DEFAULT 'PROPOSED' CHECK (status IN ('PROPOSED','APPROVED','REJECTED','SIMULATED','EXECUTED')),
+    status TEXT NOT NULL DEFAULT 'PROPOSED'
+        CHECK (
+            status IN (
+                'PROPOSED',
+                'APPROVED',
+                'REJECTED',
+                'SIMULATED',
+                'EXECUTED'
+            )
+        ),
     created_at TEXT NOT NULL
 );
-CREATE INDEX idx_portfolio_investor ON portfolio(investor_id);
-CREATE INDEX idx_holding_portfolio_date ON holding(portfolio_id, as_of_date);
-CREATE INDEX idx_holding_instrument ON holding(instrument_id);
-CREATE INDEX idx_price_instrument_date ON market_price(instrument_id, price_date DESC);
-CREATE INDEX idx_target_portfolio_dates ON target_allocation(portfolio_id, effective_from, effective_to);
-CREATE INDEX idx_trade_proposal ON trade(proposal_id);
-CREATE INDEX idx_proposal_portfolio_date ON rebalance_proposal(portfolio_id, as_of_date DESC);
-CREATE INDEX idx_constraint_scope_dates ON constraint_rule(portfolio_id, instrument_id, effective_from, effective_to);
+CREATE INDEX idx_portfolio_investor
+    ON portfolio(investor_id);
+CREATE INDEX idx_holding_portfolio_date
+    ON holding(portfolio_id, as_of_date);
+CREATE INDEX idx_holding_instrument
+    ON holding(instrument_id);
+CREATE INDEX idx_price_instrument_date
+    ON market_price(instrument_id, price_date DESC);
+CREATE INDEX idx_target_portfolio_dates
+    ON target_allocation(portfolio_id, effective_from, effective_to);
+CREATE INDEX idx_trade_proposal
+    ON trade(proposal_id);
+CREATE INDEX idx_proposal_portfolio_date
+    ON rebalance_proposal(portfolio_id, as_of_date DESC);
+CREATE INDEX idx_constraint_scope_dates
+    ON constraint_rule(
+        portfolio_id,
+        instrument_id,
+        effective_from,
+        effective_to
+    );
 CREATE TRIGGER trg_proposal_status_transition
 BEFORE UPDATE OF status ON rebalance_proposal
 WHEN OLD.status <> NEW.status AND NOT (
-    (OLD.status = 'GENERATED' AND NEW.status IN ('APPROVED','REJECTED','SIMULATED')) OR
-    (OLD.status = 'REVIEW_REQUIRED' AND NEW.status = 'REJECTED') OR
-    (OLD.status = 'APPROVED' AND NEW.status = 'SIMULATED')
+    (
+        OLD.status = 'GENERATED'
+        AND NEW.status IN ('APPROVED', 'REJECTED')
+    )
+    OR (
+        OLD.status = 'REVIEW_REQUIRED'
+        AND NEW.status = 'REJECTED'
+    )
+    OR (
+        OLD.status = 'APPROVED'
+        AND NEW.status = 'SIMULATED'
+    )
 )
 BEGIN
-    SELECT RAISE(ABORT, 'invalid rebalance proposal lifecycle transition');
+    SELECT RAISE(
+        ABORT,
+        'invalid rebalance proposal lifecycle transition'
+    );
 END;
 CREATE TRIGGER trg_trade_status_transition
 BEFORE UPDATE OF status ON trade
 WHEN OLD.status <> NEW.status AND NOT (
-    (OLD.status = 'PROPOSED' AND NEW.status IN ('APPROVED','REJECTED','SIMULATED','EXECUTED')) OR
-    (OLD.status = 'APPROVED' AND NEW.status IN ('REJECTED','SIMULATED','EXECUTED')) OR
-    (OLD.status = 'SIMULATED' AND NEW.status = 'EXECUTED')
+    (
+        OLD.status = 'PROPOSED'
+        AND NEW.status IN ('APPROVED', 'REJECTED')
+    )
+    OR (
+        OLD.status = 'APPROVED'
+        AND NEW.status IN ('REJECTED', 'SIMULATED', 'EXECUTED')
+    )
+    OR (
+        OLD.status = 'SIMULATED'
+        AND NEW.status = 'EXECUTED'
+    )
 )
 BEGIN
-    SELECT RAISE(ABORT, 'invalid trade lifecycle transition');
+    SELECT RAISE(
+        ABORT,
+        'invalid trade status transition'
+    );
 END;
 CREATE TRIGGER trg_entity_event_no_update
 BEFORE UPDATE ON entity_event
