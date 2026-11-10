@@ -38,15 +38,15 @@
       "holding": 5000,
       "market_price": 12482,
       "target_allocation": 5000,
-      "trade": 10,
+      "trade": 0,
       "fee_schedule": 10,
       "constraint_rule": 1055,
-      "rebalance_proposal": 2
+      "rebalance_proposal": 0
     },
     "bad_target_portfolios": 0,
     "explicitly_stale_price_rows": 21,
     "missing_price_observations": 18,
-    "trade_rows_validated": 10,
+    "trade_rows_validated": 0,
     "portfolio_weight_reconciliation": "Recomputed from source holding quantities and dated market prices for every portfolio.",
     "anomaly_results": [
       {
